@@ -10,7 +10,7 @@
 		camera?: THREE.PerspectiveCamera;
 		renderer?: THREE.WebGLRenderer;
 	} = {};
-	const { mesh, scene, camera, renderer } = sceneProps;
+	$: ({ mesh, scene, camera, renderer } = sceneProps);
 
 	let cameraRadius = 3;
 	let cameraAzimuth = 0;
@@ -18,31 +18,31 @@
 	let mouseDown = false;
 	let prevMouse = { x: 0, y: 0 };
 
-	const draw = () => {
+	function draw() {
 		if (!scene || !camera) return;
 
 		// mesh?.rotateX(0.01);
 		// mesh?.rotateY(0.01);
 		renderer?.render(scene, camera);
-	};
+	}
 
-	const start = () => {
+	function start() {
+		const { renderer } = sceneProps;
 		renderer?.setAnimationLoop(draw);
-	};
+	}
 
-	const stop = () => {
+	function stop() {
 		renderer?.setAnimationLoop(null);
-	};
+	}
 
-	const onMouseDown = () => {
+	function onMouseDown() {
 		mouseDown = true;
-	};
-	const onMouseUp = () => {
+	}
+	function onMouseUp() {
 		mouseDown = false;
-	};
-	const onMouseMove = (event: MouseEvent) => {
+	}
+	function onMouseMove(event: MouseEvent) {
 		if (!mouseDown) return;
-		console.log('here');
 
 		cameraAzimuth += 0.5 * (prevMouse.x - event.clientX);
 		cameraElevation = Math.min(
@@ -51,9 +51,9 @@
 		);
 		updateCameraPosition();
 		prevMouse = { x: event.clientX, y: event.clientY };
-	};
+	}
 
-	const updateCameraPosition = () => {
+	function updateCameraPosition() {
 		if (!camera) return;
 
 		camera.position.set(
@@ -67,13 +67,13 @@
 		);
 		camera.lookAt(0, 0, 0);
 		camera.updateMatrix();
-	};
+	}
 
 	onMount(() => {
 		const newScene = createScene(gameWindow);
 		if (!newScene) return;
 		sceneProps = newScene;
-		// updateCameraPosition();
+		updateCameraPosition();
 		start();
 	});
 </script>
