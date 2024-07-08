@@ -2,28 +2,22 @@
 	import { onMount } from 'svelte';
 	import { createScene } from './scene';
 	import * as THREE from 'three';
+	import { createCamera } from './camera';
 
 	let gameWindow: HTMLElement;
 	let sceneProps: {
 		mesh?: THREE.Mesh;
 		scene?: THREE.Scene;
-		camera?: THREE.PerspectiveCamera;
+
 		renderer?: THREE.WebGLRenderer;
 	} = {};
-	$: ({ mesh, scene, camera, renderer } = sceneProps);
-
-	let cameraRadius = 3;
-	let cameraAzimuth = 0;
-	let cameraElevation = 0;
-	let mouseDown = false;
-	let prevMouse = { x: 0, y: 0 };
+	let camera: ReturnType<typeof createCamera>;
+	$: ({ scene, renderer } = sceneProps);
 
 	function draw() {
 		if (!scene || !camera) return;
 
-		// mesh?.rotateX(0.01);
-		// mesh?.rotateY(0.01);
-		renderer?.render(scene, camera);
+		renderer?.render(scene, camera.camera);
 	}
 
 	function start() {
@@ -31,54 +25,20 @@
 		renderer?.setAnimationLoop(draw);
 	}
 
-	function stop() {
-		renderer?.setAnimationLoop(null);
-	}
-
-	function onMouseDown() {
-		mouseDown = true;
-	}
-	function onMouseUp() {
-		mouseDown = false;
-	}
-	function onMouseMove(event: MouseEvent) {
-		if (!mouseDown) return;
-
-		cameraAzimuth += 0.5 * (prevMouse.x - event.clientX);
-		cameraElevation = Math.min(
-			90,
-			Math.max(0, cameraElevation + 0.5 * (event.clientY - prevMouse.y))
-		);
-		updateCameraPosition();
-		prevMouse = { x: event.clientX, y: event.clientY };
-	}
-
-	function updateCameraPosition() {
-		if (!camera) return;
-
-		camera.position.set(
-			cameraRadius *
-				Math.sin((cameraAzimuth * Math.PI) / 180) *
-				Math.cos((cameraElevation * Math.PI) / 180),
-			cameraRadius * Math.sin((cameraElevation * Math.PI) / 180),
-			cameraRadius *
-				Math.cos((cameraAzimuth * Math.PI) / 180) *
-				Math.sin((cameraElevation * Math.PI) / 180)
-		);
-		camera.lookAt(0, 0, 0);
-		camera.updateMatrix();
-	}
-
 	onMount(() => {
 		const newScene = createScene(gameWindow);
 		if (!newScene) return;
 		sceneProps = newScene;
-		updateCameraPosition();
+		camera = createCamera(gameWindow);
 		start();
 	});
 </script>
 
-<svelte:document on:mousemove={onMouseMove} on:mouseup={onMouseUp} on:mousedown={onMouseDown} />
+<svelte:document
+	on:mousemove={(event) => camera?.onMouseMove(event)}
+	on:mouseup={() => camera?.onMouseUp()}
+	on:mousedown={() => camera?.onMouseDown()}
+/>
 
 <div id="root-window">
 	<div id="render-target" bind:this={gameWindow}></div>

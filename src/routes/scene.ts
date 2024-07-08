@@ -6,14 +6,6 @@ export function createScene(gameWindow: HTMLElement) {
 
     if (!gameWindow?.offsetWidth || !gameWindow?.offsetHeight) return;
 
-    const camera = new THREE.PerspectiveCamera(
-        75,
-        gameWindow.offsetWidth / gameWindow.offsetHeight,
-        0.1,
-        1000
-    );
-    camera.position.z = 5;
-
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
     gameWindow.appendChild(renderer.domElement);
@@ -23,5 +15,5 @@ export function createScene(gameWindow: HTMLElement) {
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
 
-    return { mesh, scene, camera, renderer }
+    return { mesh, scene, renderer }
 }
