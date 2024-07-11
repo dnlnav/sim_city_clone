@@ -36,8 +36,8 @@
 
 <svelte:document
 	on:mousemove={(event) => camera?.onMouseMove(event)}
-	on:mouseup={() => camera?.onMouseUp()}
-	on:mousedown={() => camera?.onMouseDown()}
+	on:mouseup={(event) => camera?.onMouseUp(event)}
+	on:mousedown={(event) => camera?.onMouseDown(event)}
 />
 
 <div id="root-window">
