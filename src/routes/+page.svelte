@@ -3,6 +3,7 @@
 	import { createScene } from './scene';
 	import * as THREE from 'three';
 	import { createCamera } from './camera';
+	import { createCity } from './city';
 
 	let gameWindow: HTMLElement;
 	let sceneProps: {
@@ -27,7 +28,10 @@
 
 	onMount(() => {
 		const newScene = createScene(gameWindow);
+		const city = createCity(8);
 		if (!newScene) return;
+
+		newScene.initialize(city);
 		sceneProps = newScene;
 		camera = createCamera(gameWindow);
 		start();
@@ -36,7 +40,7 @@
 
 <svelte:document
 	on:mousemove={(event) => camera?.onMouseMove(event)}
-	on:mouseup={(event) => camera?.onMouseUp(event)}
+	on:mouseup={(event) => camera?.onMouseUp()}
 	on:mousedown={(event) => camera?.onMouseDown(event)}
 />
 
