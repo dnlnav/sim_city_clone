@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { cityType } from './city';
+import { type cityType } from './city.svelte';
 
 export function createScene(gameWindow: HTMLElement) {
 	const scene = new THREE.Scene();
@@ -11,7 +11,8 @@ export function createScene(gameWindow: HTMLElement) {
 	renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
 	gameWindow.appendChild(renderer.domElement);
 
-	let meshes: THREE.Mesh[][] = [];
+	let terrain: THREE.Mesh[][] = [];
+	let buildings: (THREE.Mesh | undefined)[][] = $state([]);
 
 	const setupLights = () => {
 		const lights = [
@@ -27,14 +28,14 @@ export function createScene(gameWindow: HTMLElement) {
 		scene.add(...lights);
 	};
 
-	const initialize = (city: cityType) => {
+	const initialize = ({ data }: { data: cityType }) => {
 		scene.clear();
-		meshes = city.data.map((dataRow) =>
+		terrain = data.map((dataRow) =>
 			dataRow.map(({ x, y }) => {
 				const geometry = new THREE.BoxGeometry(1, 1, 1);
 				const material = new THREE.MeshLambertMaterial({ color: 0x009900 });
 				const mesh = new THREE.Mesh(geometry, material);
-				mesh.position.set(x, 0, y);
+				mesh.position.set(x, -0.5, y);
 				scene.add(mesh);
 				return mesh;
 			})
@@ -42,5 +43,25 @@ export function createScene(gameWindow: HTMLElement) {
 		setupLights();
 	};
 
-	return { meshes, scene, renderer, initialize };
+	const update = ({ data }: { data: cityType }) => {
+		try {
+			buildings = data.map((dataRow) =>
+				dataRow.map(({ x, y, building: height }) => {
+					if (height < 1) return;
+					if (buildings[x][y]) scene.remove(buildings[x][y]);
+
+					const geometry = new THREE.BoxGeometry(1, height, 1);
+					const material = new THREE.MeshLambertMaterial({ color: 0x777777 });
+					const mesh = new THREE.Mesh(geometry, material);
+					mesh.position.set(x, height / 2, y);
+					scene.add(mesh);
+					return mesh;
+				})
+			);
+		} catch {
+			debugger;
+		}
+	};
+
+	return { terrain, buildings, scene, renderer, initialize, update };
 }

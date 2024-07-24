@@ -1,47 +1,20 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { createScene } from './scene';
-	import * as THREE from 'three';
-	import { createCamera } from './camera';
-	import { createCity } from './city';
+	import { createGame } from './game.svelte';
 
-	let gameWindow: HTMLElement;
-	let sceneProps: {
-		mesh?: THREE.Mesh;
-		scene?: THREE.Scene;
-
-		renderer?: THREE.WebGLRenderer;
-	} = {};
-	let camera: ReturnType<typeof createCamera>;
-	$: ({ scene, renderer } = sceneProps);
-
-	function draw() {
-		if (!scene || !camera) return;
-
-		renderer?.render(scene, camera.camera);
-	}
-
-	function start() {
-		const { renderer } = sceneProps;
-		renderer?.setAnimationLoop(draw);
-	}
+	let gameWindow: HTMLElement | undefined = $state();
+	let game: ReturnType<typeof createGame>;
 
 	onMount(() => {
-		const newScene = createScene(gameWindow);
-		const city = createCity(8);
-		if (!newScene) return;
-
-		newScene.initialize(city);
-		sceneProps = newScene;
-		camera = createCamera(gameWindow);
-		start();
+		if (!gameWindow) return;
+		game = createGame(gameWindow);
 	});
 </script>
 
 <svelte:document
-	on:mousemove={(event) => camera?.onMouseMove(event)}
-	on:mouseup={(event) => camera?.onMouseUp()}
-	on:mousedown={(event) => camera?.onMouseDown(event)}
+	on:mousemove={(event) => game?.onMouseMove(event)}
+	on:mouseup={() => game?.onMouseUp()}
+	on:mousedown={(event) => game?.onMouseDown(event)}
 />
 
 <div id="root-window">

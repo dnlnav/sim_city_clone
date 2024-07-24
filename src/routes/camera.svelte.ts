@@ -20,20 +20,33 @@ const defaultMouseState = {
 };
 
 export const createCamera = (gameWindow: HTMLElement) => {
-	const cameraOrigin = new THREE.Vector3();
-	let cameraRadius = mean(Object.values(CAMERA_RADIUS_LIMITS));
-	let cameraAzimuth = 135;
-	let cameraElevation = 45;
-	let isMouseButtonDown = defaultMouseState;
-	let prevMouse = { x: 0, y: 0 };
-
 	const camera = new THREE.PerspectiveCamera(
 		75,
 		gameWindow.offsetWidth / gameWindow.offsetHeight,
 		0.1,
 		1000
 	);
-	updateCameraPosition();
+	const cameraOrigin = new THREE.Vector3();
+	let cameraRadius = $state(mean(Object.values(CAMERA_RADIUS_LIMITS)));
+	let cameraAzimuth = $state(135);
+	let cameraElevation = $state(45);
+	let isMouseButtonDown = defaultMouseState;
+	let prevMouse = { x: 0, y: 0 };
+
+	const updateCameraPosition = () => {
+		if (!camera) return;
+
+		camera.position.setFromSphericalCoords(
+			cameraRadius,
+			degToRad(-cameraElevation),
+			degToRad(cameraAzimuth)
+		);
+		camera.position.add(cameraOrigin);
+		camera.lookAt(cameraOrigin);
+		camera.updateMatrix();
+	};
+
+	$effect(updateCameraPosition);
 
 	function onMouseDown(event: MouseEvent) {
 		switch (true) {
@@ -62,7 +75,6 @@ export const createCamera = (gameWindow: HTMLElement) => {
 				CAMERA_ELEVATION_LIMITS.min,
 				CAMERA_ELEVATION_LIMITS.max
 			);
-			updateCameraPosition();
 		}
 
 		//camera pan
@@ -81,23 +93,8 @@ export const createCamera = (gameWindow: HTMLElement) => {
 				CAMERA_RADIUS_LIMITS.min,
 				CAMERA_RADIUS_LIMITS.max
 			);
-			updateCameraPosition();
 		}
-		// console.log({ isMouseButtonDown, cameraRadius, cameraAzimuth, cameraElevation, deltaX, deltaY })
 		prevMouse = { x: event.clientX, y: event.clientY };
-	}
-
-	function updateCameraPosition() {
-		if (!camera) return;
-
-		camera.position.setFromSphericalCoords(
-			cameraRadius,
-			degToRad(-cameraElevation),
-			degToRad(cameraAzimuth)
-		);
-		camera.position.add(cameraOrigin);
-		camera.lookAt(cameraOrigin);
-		camera.updateMatrix();
 	}
 
 	return { camera, onMouseDown, onMouseMove, onMouseUp };
