@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { type cityType } from './city.svelte';
+import { createAssetInstance } from './assets';
 
 export function createScene(gameWindow: HTMLElement) {
 	const scene = new THREE.Scene();
@@ -32,35 +33,24 @@ export function createScene(gameWindow: HTMLElement) {
 		scene.clear();
 		terrain = data.map((dataRow) =>
 			dataRow.map(({ x, y }) => {
-				const geometry = new THREE.BoxGeometry(1, 1, 1);
-				const material = new THREE.MeshLambertMaterial({ color: 0x009900 });
-				const mesh = new THREE.Mesh(geometry, material);
-				mesh.position.set(x, -0.5, y);
-				scene.add(mesh);
-				return mesh;
+				const mesh = createAssetInstance('grass', x, y);
+				if (mesh) scene.add(mesh);
+				return mesh as THREE.Mesh;
 			})
 		);
 		setupLights();
 	};
 
 	const update = ({ data }: { data: cityType }) => {
-		try {
-			buildings = data.map((dataRow) =>
-				dataRow.map(({ x, y, building: height }) => {
-					if (height < 1) return;
-					if (buildings[x][y]) scene.remove(buildings[x][y]);
-
-					const geometry = new THREE.BoxGeometry(1, height, 1);
-					const material = new THREE.MeshLambertMaterial({ color: 0x777777 });
-					const mesh = new THREE.Mesh(geometry, material);
-					mesh.position.set(x, height / 2, y);
-					scene.add(mesh);
-					return mesh;
-				})
-			);
-		} catch {
-			debugger;
-		}
+		buildings = data.map((dataRow) =>
+			dataRow.map(({ x, y, building }) => {
+				if (!building) return;
+				if (buildings[x][y]) scene.remove(buildings[x][y]);
+				const mesh = createAssetInstance(building, x, y);
+				if (mesh) scene.add(mesh);
+				return mesh as THREE.Mesh;
+			})
+		);
 	};
 
 	return { terrain, buildings, scene, renderer, initialize, update };

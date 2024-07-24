@@ -1,10 +1,9 @@
 import { range } from 'ramda';
 
 export const BUILDING_STATES = {
-	none: 0,
-	building_1: 1,
-	building_2: 2,
-	building_3: 3
+	building_1: 'building_1',
+	building_2: 'building_2',
+	building_3: 'building_3'
 } as const;
 
 type buildingValue = (typeof BUILDING_STATES)[keyof typeof BUILDING_STATES];
@@ -12,7 +11,7 @@ type buildingValue = (typeof BUILDING_STATES)[keyof typeof BUILDING_STATES];
 type tileType = {
 	x: number;
 	y: number;
-	building: buildingValue;
+	building: buildingValue | null;
 };
 export type cityType = tileType[][];
 
@@ -28,7 +27,7 @@ export const createCity = (size: number) => {
 				(rowNumber): tileType => ({
 					x: columnNumber,
 					y: rowNumber,
-					building: BUILDING_STATES.none
+					building: null
 				})
 			)
 		)
@@ -36,13 +35,18 @@ export const createCity = (size: number) => {
 
 	const update = () => {
 		data = updateTiles(data, (tile): tileType => {
-			const change = Math.random() < 0.01;
-			return tile.building < BUILDING_STATES.building_3 && change
-				? ({
-						...tile,
-						building: tile.building + 1
-					} as tileType)
-				: tile;
+			if (Math.random() > 0.01) return tile;
+
+			switch (tile.building) {
+				case null:
+					return { ...tile, building: BUILDING_STATES.building_1 };
+				case BUILDING_STATES.building_1:
+					return { ...tile, building: BUILDING_STATES.building_2 };
+				case BUILDING_STATES.building_2:
+					return { ...tile, building: BUILDING_STATES.building_3 };
+				default:
+					return tile;
+			}
 		});
 	};
 
