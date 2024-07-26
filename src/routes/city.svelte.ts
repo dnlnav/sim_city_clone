@@ -1,24 +1,21 @@
-import { range } from 'ramda';
+import { map, range } from 'ramda';
+import { ASSETS_IDS, type AssetType } from './assets';
 
-export const BUILDING_STATES = {
-	building_1: 'building_1',
-	building_2: 'building_2',
-	building_3: 'building_3'
-} as const;
+export type buildingValue = Exclude<AssetType, 'grass'>;
+export type terrainValue = Extract<AssetType, 'grass'>;
 
-type buildingValue = (typeof BUILDING_STATES)[keyof typeof BUILDING_STATES];
-
-type tileType = {
+export type tileType = {
 	x: number;
 	y: number;
-	building: buildingValue | null;
+	terrainId: terrainValue | null;
+	buildingId: buildingValue | null;
 };
 export type cityType = tileType[][];
 
-const updateTiles = (
-	tileArray: tileType[][],
-	updateFunc: (x: tileType) => tileType
-): tileType[][] => tileArray.map((x) => x.map(updateFunc));
+export const updateTiles = <T, K extends tileType>(
+	tileArray: K[][],
+	updateFunc: (x: K) => T
+): T[][] => map(map(updateFunc), tileArray);
 
 export const createCity = (size: number) => {
 	let data = $state(
@@ -27,7 +24,8 @@ export const createCity = (size: number) => {
 				(rowNumber): tileType => ({
 					x: columnNumber,
 					y: rowNumber,
-					building: null
+					terrainId: 'grass',
+					buildingId: null
 				})
 			)
 		)
@@ -37,13 +35,13 @@ export const createCity = (size: number) => {
 		data = updateTiles(data, (tile): tileType => {
 			if (Math.random() > 0.01) return tile;
 
-			switch (tile.building) {
+			switch (tile.buildingId) {
 				case null:
-					return { ...tile, building: BUILDING_STATES.building_1 };
-				case BUILDING_STATES.building_1:
-					return { ...tile, building: BUILDING_STATES.building_2 };
-				case BUILDING_STATES.building_2:
-					return { ...tile, building: BUILDING_STATES.building_3 };
+					return { ...tile, buildingId: ASSETS_IDS.building_1 };
+				case ASSETS_IDS.building_1:
+					return { ...tile, buildingId: ASSETS_IDS.building_2 };
+				case ASSETS_IDS.building_2:
+					return { ...tile, buildingId: ASSETS_IDS.building_3 };
 				default:
 					return tile;
 			}
