@@ -66,26 +66,25 @@ export function createScene(gameWindow: HTMLElement) {
 	};
 
 	const update = ({ data }: { data: cityType }) => {
-		buildings = updateTiles(data, ({ x, y, buildingId }) => {
-			if (!isBuilding(buildingId)) return;
+		buildings = updateTiles(data, ({ x, y, buildingId: newBuildingId }) => {
 			const currentBuilding = buildings?.[x]?.[y];
-
 			const currentBuildingId = currentBuilding?.userData.id;
-			const newBuildingId = buildingId;
 
 			// If a player removes a building, remove it from the scene
 			if (currentBuildingId && !newBuildingId) {
 				if (currentBuilding) scene.remove(currentBuilding);
 				return;
 			}
+			if (!isBuilding(newBuildingId)) return;
 
 			// If the data model has changed, update the mesh
 			if (currentBuildingId !== newBuildingId) {
 				if (currentBuilding) scene.remove(currentBuilding);
-				const mesh = createAssetInstance(buildingId, x, y);
+				const mesh = createAssetInstance(newBuildingId, x, y);
 				scene.add(mesh);
 				return mesh;
 			}
+			return currentBuilding;
 		});
 	};
 
@@ -99,13 +98,12 @@ export function createScene(gameWindow: HTMLElement) {
 
 		if (!(intersections?.[0]?.object instanceof THREE.Mesh)) return;
 
-		debugger;
 		if (selectedObject) selectedObject.material.emissive.setHex(0);
 		selectedObject = intersections[0].object;
 		selectedObject.material.emissive.setHex(0x555555);
 	};
 
-	const onMouseUp = (event: MouseEvent) => {
+	const onMouseUp = () => {
 		camera.onMouseUp();
 	};
 
@@ -114,10 +112,10 @@ export function createScene(gameWindow: HTMLElement) {
 	};
 
 	return {
-		terrain,
-		buildings,
 		scene,
 		renderer,
+		terrain,
+		buildings,
 		initialize,
 		update,
 		onMouseDown,
