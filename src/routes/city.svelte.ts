@@ -1,8 +1,8 @@
 import { map, range } from 'ramda';
-import { ASSETS_IDS, type AssetType } from './assets';
+import { type AssetType } from './assets';
 
-export type buildingValue = Exclude<AssetType, 'grass'>;
-export type terrainValue = Extract<AssetType, 'grass'>;
+export type buildingValue = Exclude<AssetType, ['grass', 'road']>;
+export type terrainValue = Extract<AssetType, 'grass' | 'road'>;
 
 export type tileType = {
 	x: number;
@@ -18,7 +18,7 @@ export const updateTiles = <T, K extends tileType>(
 ): T[][] => map(map(updateFunc), tileArray);
 
 export const createCity = (size: number) => {
-	let data = $state(
+	const data = $state(
 		range(0, size).map((columnNumber) =>
 			range(0, size).map(
 				(rowNumber): tileType => ({
@@ -31,27 +31,17 @@ export const createCity = (size: number) => {
 		)
 	);
 
-	const update = () => {
-		data = updateTiles(data, (tile): tileType => {
-			if (Math.random() > 0.01) return tile;
+	const update = () => {};
 
-			switch (tile.buildingId) {
-				case null:
-					return { ...tile, buildingId: ASSETS_IDS.building_1 };
-				case ASSETS_IDS.building_1:
-					return { ...tile, buildingId: ASSETS_IDS.building_2 };
-				case ASSETS_IDS.building_2:
-					return { ...tile, buildingId: ASSETS_IDS.building_3 };
-				default:
-					return tile;
-			}
-		});
+	const updateTile = (x: number, y: number, newObject: Partial<tileType>) => {
+		data[x][y] = { ...data[x][y], ...newObject };
 	};
 
 	return {
 		get data() {
 			return data;
 		},
-		update
+		update,
+		updateTile
 	};
 };

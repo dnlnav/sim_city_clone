@@ -9,12 +9,14 @@ type renderParamsType = {
 	camera: ReturnType<typeof createCamera>;
 };
 
+type onObjectSelectedType = (objectSelected: MeshType) => void;
+
 const setupLights = (scene: THREE.Scene) => {
 	const lights = [
-		new THREE.AmbientLight(0xffffff, 0.2),
-		new THREE.DirectionalLight(0xffffff, 0.3),
-		new THREE.DirectionalLight(0xffffff, 0.3),
-		new THREE.DirectionalLight(0xffffff, 0.3)
+		new THREE.AmbientLight(0xffffff, 0.5),
+		new THREE.DirectionalLight(0xffffff, 0.7),
+		new THREE.DirectionalLight(0xffffff, 0.7),
+		new THREE.DirectionalLight(0xffffff, 0.7)
 	];
 
 	lights[1].position.set(0, 1, 0);
@@ -51,8 +53,9 @@ export function createScene(gameWindow: HTMLElement) {
 	let selectedObject: MeshType | undefined = undefined;
 	let terrain: (MeshType | undefined)[][] = $state([]);
 	let buildings: (MeshType | undefined)[][] = $state([]);
+	let onObjectSelected: onObjectSelectedType | null = $state(null);
 
-	const initialize = ({ data }: { data: cityType }) => {
+	const initialize = ({ data }: { data: cityType }, _onObjectSelected: onObjectSelectedType) => {
 		scene.clear();
 		terrain = updateTiles(data, ({ x, y }: tileType) => {
 			const terrainId = data[x][y].terrainId;
@@ -63,6 +66,7 @@ export function createScene(gameWindow: HTMLElement) {
 		});
 		setupLights(scene);
 		start({ scene, renderer, camera });
+		onObjectSelected = _onObjectSelected;
 	};
 
 	const update = ({ data }: { data: cityType }) => {
@@ -99,8 +103,11 @@ export function createScene(gameWindow: HTMLElement) {
 		if (!(intersections?.[0]?.object instanceof THREE.Mesh)) return;
 
 		if (selectedObject) selectedObject.material.emissive.setHex(0);
-		selectedObject = intersections[0].object;
+		selectedObject = intersections[0].object as MeshType;
+		if (!selectedObject) return;
 		selectedObject.material.emissive.setHex(0x555555);
+
+		onObjectSelected?.(selectedObject);
 	};
 
 	const onMouseUp = () => {

@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { createGame } from './game.svelte';
+	import Toolbar from './toolbar/Toolbar.svelte';
 
 	let gameWindow: HTMLElement | undefined = $state();
-	let game: ReturnType<typeof createGame>;
+	let game: ReturnType<typeof createGame> = $state();
 
 	onMount(() => {
 		if (!gameWindow) return;
@@ -19,6 +20,7 @@
 
 <div id="root-window">
 	<div id="render-target" bind:this={gameWindow}></div>
+	{#if game?.toolId}<Toolbar toolId={game.toolId} />{/if}
 </div>
 
 <style>
@@ -28,6 +30,7 @@
 	}
 	#root-window {
 		height: 100%;
+		position: relative;
 	}
 	#render-target {
 		height: 100%;

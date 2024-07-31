@@ -11,7 +11,7 @@ const CAMERA_ELEVATION_LIMITS = { min: 30, max: 90 } as const;
 
 const ROTATION_SENSITIVITY = 0.5;
 const ZOOM_SENSITIVITY = 0.02;
-const PAN_SENSITIVITY = -0.01;
+const PAN_SENSITIVITY = 0.03;
 
 const defaultMouseState = {
 	left: false,
