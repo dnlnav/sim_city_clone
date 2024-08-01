@@ -5,7 +5,7 @@ import { createToolbarId } from './toolbar/toolbarState.svelte';
 
 export const createGame = (gameWindow: HTMLElement) => {
 	const toolId = createToolbarId();
-	const city = createCity(8);
+	const city = createCity(16);
 	const scene = createScene(gameWindow, city);
 	if (!scene) return;
 	scene.initialize((objectSelected) => {
