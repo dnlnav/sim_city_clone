@@ -1,40 +1,47 @@
 import { map, range } from 'ramda';
-import { type AssetType } from './assets';
+import { type AssetType, type MeshType } from './assets';
+import type { BuildingObject, BuildingValue } from './buildings';
 
-export type buildingValue = Exclude<AssetType, ['grass', 'road']>;
-export type terrainValue = Extract<AssetType, 'grass' | 'road'>;
+export type TerrainValue = Extract<AssetType, 'grass'>;
 
-export type tileType = {
+export type TileType = {
 	x: number;
 	y: number;
-	terrainId: terrainValue | null;
-	buildingId: buildingValue | null;
+	terrainId?: TerrainValue;
+	building?: BuildingObject<BuildingValue>;
+	buildingMesh?: MeshType;
 };
-export type cityType = tileType[][];
+export type cityType = TileType[][];
 
-export const updateTiles = <T, K extends tileType>(
-	tileArray: K[][],
-	updateFunc: (x: K) => T
-): T[][] => map(map(updateFunc), tileArray);
+export const mapTiles = <T, K extends TileType>(tileArray: K[][], updateFunc: (x: K) => T): T[][] =>
+	map(map(updateFunc), tileArray);
+
+const createTile = (x: number, y: number): TileType => {
+	return {
+		x,
+		y,
+		terrainId: 'grass'
+	};
+};
 
 export const createCity = (size: number) => {
-	const data = $state(
+	let data = $state(
 		range(0, size).map((columnNumber) =>
-			range(0, size).map(
-				(rowNumber): tileType => ({
-					x: columnNumber,
-					y: rowNumber,
-					terrainId: 'grass',
-					buildingId: null
-				})
-			)
+			range(0, size).map((rowNumber) => createTile(columnNumber, rowNumber))
 		)
 	);
 
-	const update = () => {};
+	const update = (transformFunc: (tile: TileType) => TileType) => {
+		data = mapTiles(data, (tile) => tile.building?.update?.(tile, transformFunc) ?? tile);
+	};
 
-	const updateTile = (x: number, y: number, newObject: Partial<tileType>) => {
-		data[x][y] = { ...data[x][y], ...newObject };
+	const updateTile = (
+		{ x, y }: { x: number; y: number },
+		newObject: Partial<TileType>,
+		transformFunc?: (tile: TileType) => TileType
+	) => {
+		const updatedTile = { ...data[x][y], ...newObject };
+		data[x][y] = transformFunc?.(updatedTile) ?? updatedTile;
 	};
 
 	return {

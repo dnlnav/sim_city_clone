@@ -1,7 +1,8 @@
 import * as THREE from 'three';
-import { updateTiles, type buildingValue, type cityType, type tileType } from './city.svelte';
-import { ASSETS_IDS, createAssetInstance, type AssetType, type MeshType } from './assets';
+import { type createCity, mapTiles, type TileType } from './city.svelte';
+import { createAssetInstance, type MeshType } from './assets';
 import { createCamera } from './camera.svelte';
+import { assoc } from 'ramda';
 
 type renderParamsType = {
 	scene: THREE.Scene;
@@ -35,10 +36,20 @@ const draw = ({ renderer, scene, camera }: renderParamsType) => {
 	renderer?.render(scene, camera.camera);
 };
 
-const isBuilding = (asset: AssetType | null): asset is buildingValue =>
-	!!asset && asset !== ASSETS_IDS.grass;
+const updateMesh = (
+	scene: THREE.Scene,
+	{ x, y, building, buildingMesh: existingBuildingMesh }: TileType
+) => {
+	if (existingBuildingMesh) scene.remove(existingBuildingMesh);
 
-export function createScene(gameWindow: HTMLElement) {
+	if (!building) return;
+
+	const mesh = createAssetInstance(building.id, x, y, building);
+	scene.add(mesh);
+	return mesh;
+};
+
+export function createScene(gameWindow: HTMLElement, city: ReturnType<typeof createCity>) {
 	const scene = new THREE.Scene();
 	scene.background = new THREE.Color(0x777777);
 
@@ -52,13 +63,11 @@ export function createScene(gameWindow: HTMLElement) {
 
 	let selectedObject: MeshType | undefined = undefined;
 	let terrain: (MeshType | undefined)[][] = $state([]);
-	let buildings: (MeshType | undefined)[][] = $state([]);
 	let onObjectSelected: onObjectSelectedType | null = $state(null);
 
-	const initialize = ({ data }: { data: cityType }, _onObjectSelected: onObjectSelectedType) => {
+	const initialize = (_onObjectSelected: onObjectSelectedType) => {
 		scene.clear();
-		terrain = updateTiles(data, ({ x, y }: tileType) => {
-			const terrainId = data[x][y].terrainId;
+		terrain = mapTiles(city.data, ({ x, y, terrainId }: TileType) => {
 			if (!terrainId) return;
 			const mesh = createAssetInstance(terrainId, x, y);
 			scene.add(mesh);
@@ -69,27 +78,14 @@ export function createScene(gameWindow: HTMLElement) {
 		onObjectSelected = _onObjectSelected;
 	};
 
-	const update = ({ data }: { data: cityType }) => {
-		buildings = updateTiles(data, ({ x, y, buildingId: newBuildingId }) => {
-			const currentBuilding = buildings?.[x]?.[y];
-			const currentBuildingId = currentBuilding?.userData.id;
+	const getUpdateTile = (tile: TileType) => assoc('buildingMesh', updateMesh(scene, tile), tile);
 
-			// If a player removes a building, remove it from the scene
-			if (currentBuildingId && !newBuildingId) {
-				if (currentBuilding) scene.remove(currentBuilding);
-				return;
-			}
-			if (!isBuilding(newBuildingId)) return;
+	const update = () => {
+		city.update(getUpdateTile);
+	};
 
-			// If the data model has changed, update the mesh
-			if (currentBuildingId !== newBuildingId) {
-				if (currentBuilding) scene.remove(currentBuilding);
-				const mesh = createAssetInstance(newBuildingId, x, y);
-				scene.add(mesh);
-				return mesh;
-			}
-			return currentBuilding;
-		});
+	const updateTile = (pos: { x: number; y: number }, newObject: Partial<TileType>) => {
+		city.updateTile(pos, newObject, getUpdateTile);
 	};
 
 	const onMouseDown = (event: MouseEvent) => {
@@ -122,9 +118,9 @@ export function createScene(gameWindow: HTMLElement) {
 		scene,
 		renderer,
 		terrain,
-		buildings,
 		initialize,
 		update,
+		updateTile,
 		onMouseDown,
 		onMouseUp,
 		onMouseMove
