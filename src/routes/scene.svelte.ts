@@ -1,8 +1,9 @@
 import * as THREE from 'three';
 import { type createCity, mapTiles, type TileType } from './city.svelte';
-import { createAssetInstance, type MeshType } from './assets';
+import { createAssetInstance } from './assets';
 import { createCamera } from './camera.svelte';
 import { assoc } from 'ramda';
+import type { MeshType } from './assetsTypes';
 
 type renderParamsType = {
 	scene: THREE.Scene;
@@ -13,17 +14,22 @@ type renderParamsType = {
 type onObjectSelectedType = (objectSelected: MeshType) => void;
 
 const setupLights = (scene: THREE.Scene) => {
-	const lights = [
-		new THREE.AmbientLight(0xffffff, 0.5),
-		new THREE.DirectionalLight(0xffffff, 0.7),
-		new THREE.DirectionalLight(0xffffff, 0.7),
-		new THREE.DirectionalLight(0xffffff, 0.7)
-	];
+	const sun = new THREE.DirectionalLight(0xffffff, 1);
+	sun.position.set(20, 20, 20);
+	sun.castShadow = true;
+	sun.shadow.camera.left = -10;
+	sun.shadow.camera.right = 10;
+	sun.shadow.camera.top = 0;
+	sun.shadow.camera.bottom = -16;
+	sun.shadow.camera.near = 0.5;
+	sun.shadow.camera.far = 50;
 
-	lights[1].position.set(0, 1, 0);
-	lights[2].position.set(1, 1, 0);
-	lights[3].position.set(0, 1, 1);
-	scene.add(...lights);
+	sun.shadow.mapSize.width = 1024;
+	sun.shadow.mapSize.height = 1024;
+
+	scene.add(sun);
+	scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+	scene.add(new THREE.CameraHelper(sun.shadow.camera));
 };
 
 const start = (renderParams: renderParamsType) => {
@@ -44,7 +50,7 @@ const updateMesh = (
 
 	if (!building) return;
 
-	const mesh = createAssetInstance(building.id, x, y, building);
+	const mesh = createAssetInstance(building, x, y);
 	scene.add(mesh);
 	return mesh;
 };
@@ -56,6 +62,9 @@ export function createScene(gameWindow: HTMLElement, city: ReturnType<typeof cre
 	const camera = createCamera(gameWindow);
 	const renderer = new THREE.WebGLRenderer();
 	renderer.setSize(gameWindow.offsetWidth, gameWindow.offsetHeight);
+	renderer.setClearColor(0x000000, 0);
+	renderer.shadowMap.enabled = true;
+	renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 	gameWindow.appendChild(renderer.domElement);
 
 	const raycaster = new THREE.Raycaster();
@@ -69,7 +78,7 @@ export function createScene(gameWindow: HTMLElement, city: ReturnType<typeof cre
 		scene.clear();
 		terrain = mapTiles(city.data, ({ x, y, terrainId }: TileType) => {
 			if (!terrainId) return;
-			const mesh = createAssetInstance(terrainId, x, y);
+			const mesh = createAssetInstance({ id: terrainId }, x, y);
 			scene.add(mesh);
 			return mesh;
 		});

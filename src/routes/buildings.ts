@@ -1,11 +1,11 @@
 import { assocPath } from 'ramda';
-import type { AssetType } from './assets';
 import type { TileType } from './city.svelte';
+import type { AssetType } from './assetsTypes';
 
 export type BuildingValue = Exclude<AssetType, 'grass'>;
 export type BuildingObject<T extends BuildingValue> = {
 	id: T;
-	height: number;
+	height: 1 | 2 | 3;
 	update?: (tile: TileType, transformFunc?: (tile: TileType) => TileType) => TileType;
 };
 

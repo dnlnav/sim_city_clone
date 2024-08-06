@@ -1,6 +1,6 @@
 import { map, range } from 'ramda';
-import { type AssetType, type MeshType } from './assets';
 import type { BuildingObject, BuildingValue } from './buildings';
+import type { AssetType, MeshType } from './assetsTypes';
 
 export type TerrainValue = Extract<AssetType, 'grass'>;
 

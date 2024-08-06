@@ -10,7 +10,7 @@ const CAMERA_RADIUS_LIMITS = { min: 10, max: 20 } as const;
 const CAMERA_ELEVATION_LIMITS = { min: 30, max: 90 } as const;
 
 const ROTATION_SENSITIVITY = 0.5;
-const ZOOM_SENSITIVITY = 0.02;
+const ZOOM_SENSITIVITY = 0.06;
 const PAN_SENSITIVITY = 0.03;
 
 const defaultMouseState = {
