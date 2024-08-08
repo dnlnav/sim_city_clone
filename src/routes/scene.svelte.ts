@@ -13,6 +13,19 @@ type renderParamsType = {
 
 type onObjectSelectedType = (objectSelected: MeshType) => void;
 
+const setMaterialEmissiveHex = (object: MeshType | undefined, hexValue: number) => {
+	if (!object) return;
+	if (object) {
+		if (Array.isArray(object.material)) {
+			object.material.forEach((material) => {
+				material.emissive.setHex(hexValue);
+			});
+		} else {
+			object.material.emissive.setHex(hexValue);
+		}
+	}
+};
+
 const setupLights = (scene: THREE.Scene) => {
 	const sun = new THREE.DirectionalLight(0xffffff, 1);
 	sun.position.set(20, 20, 20);
@@ -29,7 +42,6 @@ const setupLights = (scene: THREE.Scene) => {
 
 	scene.add(sun);
 	scene.add(new THREE.AmbientLight(0xffffff, 0.3));
-	scene.add(new THREE.CameraHelper(sun.shadow.camera));
 };
 
 const start = (renderParams: renderParamsType) => {
@@ -107,10 +119,10 @@ export function createScene(gameWindow: HTMLElement, city: ReturnType<typeof cre
 
 		if (!(intersections?.[0]?.object instanceof THREE.Mesh)) return;
 
-		if (selectedObject) selectedObject.material.emissive.setHex(0);
+		setMaterialEmissiveHex(selectedObject, 0);
 		selectedObject = intersections[0].object as MeshType;
 		if (!selectedObject) return;
-		selectedObject.material.emissive.setHex(0x555555);
+		setMaterialEmissiveHex(selectedObject, 0x555555);
 
 		onObjectSelected?.(selectedObject);
 	};

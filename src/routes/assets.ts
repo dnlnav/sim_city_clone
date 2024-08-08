@@ -1,6 +1,17 @@
 import * as THREE from 'three';
 import type { AssetType, MeshType, MetaDataType } from './assetsTypes';
 
+import grassImage from '$lib/textures/grass.png';
+import residential1Image from '$lib/textures/residential1.png';
+import residential2Image from '$lib/textures/residential2.png';
+import residential3Image from '$lib/textures/residential3.png';
+import commercial1Image from '$lib/textures/commercial1.png';
+import commercial2Image from '$lib/textures/commercial2.png';
+import commercial3Image from '$lib/textures/commercial3.png';
+import industrial1Image from '$lib/textures/industrial1.png';
+import industrial2Image from '$lib/textures/industrial2.png';
+import industrialImage from '$lib/textures/industrial3.png';
+
 export const ASSETS_IDS = {
 	grass: 'grass',
 	road: 'road',
@@ -21,23 +32,25 @@ const loadTexture = (url: string) => {
 	return texture;
 };
 
-const textures = {
-	grass: loadTexture('/static/textures/grass.png'),
-	residential1: loadTexture('/static/textures/residential1.png'),
-	residential2: loadTexture('/static/textures/residential2.png'),
-	residential3: loadTexture('/static/textures/residential3.png'),
-	commercial1: loadTexture('/static/textures/commercial1.png'),
-	commercial2: loadTexture('/static/textures/commercial2.png'),
-	commercial3: loadTexture('/static/textures/commercial3.png'),
-	industrial1: loadTexture('/static/textures/industrial1.png'),
-	industrial2: loadTexture('/static/textures/industrial2.png'),
-	industrial3: loadTexture('/static/textures/industrial3.png')
-};
+const getTextures = () => ({
+	grass: loadTexture(grassImage),
+	residential1: loadTexture(residential1Image),
+	residential2: loadTexture(residential2Image),
+	residential3: loadTexture(residential3Image),
+	commercial1: loadTexture(commercial1Image),
+	commercial2: loadTexture(commercial2Image),
+	commercial3: loadTexture(commercial3Image),
+	industrial1: loadTexture(industrial1Image),
+	industrial2: loadTexture(industrial2Image),
+	industrial3: loadTexture(industrialImage)
+});
+
+type textureTypes = keyof ReturnType<typeof getTextures>;
 
 const getTopMaterial = () => new THREE.MeshLambertMaterial({ color: 0x555555 });
 
-const getSideMaterial = (textureName: keyof typeof textures) =>
-	new THREE.MeshLambertMaterial({ map: textures[textureName].clone() });
+const getSideMaterial = (textureName: textureTypes) =>
+	new THREE.MeshLambertMaterial({ map: getTextures()[textureName].clone() });
 
 const assets: {
 	[K in AssetType]: (x: number, y: number, data: MetaDataType) => MeshType;
@@ -63,7 +76,7 @@ const assets: {
 };
 
 const createZoneMesh = (x: number, y: number, data: MetaDataType) => {
-	const textureName = (data.type + data.height) as keyof typeof textures;
+	const textureName = (data.type + data.height) as textureTypes;
 
 	const topMaterial = getTopMaterial();
 	const sideMaterial = getSideMaterial(textureName);

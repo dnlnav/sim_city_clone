@@ -6,7 +6,7 @@ import { mean } from 'ramda';
 const mouseButtonMapping = ['left', 'middle', 'right'] as const;
 
 const Y_AXIS = new THREE.Vector3(0, 1, 0);
-const CAMERA_RADIUS_LIMITS = { min: 10, max: 20 } as const;
+const CAMERA_RADIUS_LIMITS = { min: 1, max: 15 } as const;
 const CAMERA_ELEVATION_LIMITS = { min: 30, max: 90 } as const;
 
 const ROTATION_SENSITIVITY = 0.5;
@@ -26,7 +26,7 @@ export const createCamera = (gameWindow: HTMLElement) => {
 		0.1,
 		1000
 	);
-	const cameraOrigin = new THREE.Vector3();
+	const cameraOrigin = new THREE.Vector3(5, 0, 10);
 	let cameraRadius = $state(mean(Object.values(CAMERA_RADIUS_LIMITS)));
 	let cameraAzimuth = $state(135);
 	let cameraElevation = $state(45);
