@@ -67,8 +67,6 @@
 	}
 
 	.container {
-		max-width: 60em;
-		margin: 2em auto;
 		text-align: center;
 	}
 </style>

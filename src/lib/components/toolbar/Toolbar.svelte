@@ -2,8 +2,22 @@
 	import Button from '$lib/components/Button.svelte';
 	import { buttons, type createToolbarId } from './toolbarState.svelte';
 
+	import bulldozerImage from '$lib/icons/bulldozer-color.png';
+	import houseImage from '$lib/icons/house-color.png';
+	import officeImage from '$lib/icons/store-color.png';
+	import factoryImage from '$lib/icons/factory-color.png';
+	import roadImage from '$lib/icons/road-color.png';
+
 	let { toolId }: { toolId: ReturnType<typeof createToolbarId> } = $props();
 	const { activeToolId, setActiveToolId } = $derived(toolId);
+
+	const IconMap = {
+		bulldoze: bulldozerImage,
+		residential: houseImage,
+		commercial: officeImage,
+		industrial: factoryImage,
+		road: roadImage
+	};
 </script>
 
 <div class="toolbar">
@@ -13,7 +27,8 @@
 				e.stopPropagation();
 				setActiveToolId(button);
 			}}
-			active={activeToolId === button}>{button}</Button
+			active={activeToolId === button}
+			><img class="button-icon" src={IconMap[button]} alt="button" /></Button
 		>
 	{/each}
 </div>
@@ -31,32 +46,11 @@
 		display: flex;
 		flex-direction: column;
 		justify-content: flex-start;
+		gap: 36px;
 	}
 
-	.ui-button {
-		height: 48px;
+	.button-icon {
+		height: 24px;
 		width: auto;
-		margin: 4px 0;
-
-		transition: background-color 0.1s ease-in-out;
-
-		background-color: #1e2331cd;
-		border: none;
-		border-radius: 8px;
-
-		color: lightgray;
-
-		display: flex;
-		justify-content: center;
-		align-items: center;
-
-		&.selected {
-			background-color: #3a3f50d3;
-			outline: 2px solid rgb(101, 101, 135);
-		}
-
-		&:not(.selected):hover {
-			background-color: #121622d3;
-		}
 	}
 </style>
