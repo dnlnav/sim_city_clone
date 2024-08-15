@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { createGame } from './game.svelte';
-	import Toolbar from './toolbar/Toolbar.svelte';
+	import Toolbar from '$lib/components/toolbar/Toolbar.svelte';
 
 	let gameWindow: HTMLElement | undefined = $state();
 	let game: ReturnType<typeof createGame> = $state();

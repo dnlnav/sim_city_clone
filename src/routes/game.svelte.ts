@@ -1,7 +1,7 @@
 import buildingFactory from './buildings';
 import { createCity } from './city.svelte';
 import { createScene } from './scene.svelte';
-import { createToolbarId } from './toolbar/toolbarState.svelte';
+import { createToolbarId } from '$lib/components/toolbar/toolbarState.svelte';
 
 export const createGame = (gameWindow: HTMLElement) => {
 	const toolId = createToolbarId();

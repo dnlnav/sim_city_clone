@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Button from '$lib/components/Button.svelte';
 	import { buttons, type createToolbarId } from './toolbarState.svelte';
 
 	let { toolId }: { toolId: ReturnType<typeof createToolbarId> } = $props();
@@ -7,10 +8,12 @@
 
 <div class="toolbar">
 	{#each buttons as button}
-		<button
-			class="ui-button"
-			class:selected={button === activeToolId}
-			onclick={() => setActiveToolId(button)}>{button}</button
+		<Button
+			onclick={(e) => {
+				e.stopPropagation();
+				setActiveToolId(button);
+			}}
+			active={activeToolId === button}>{button}</Button
 		>
 	{/each}
 </div>
