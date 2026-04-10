@@ -1,38 +1,46 @@
-import { Fragment, useState } from "react";
-import Terrain from "../Terrain.tsx";
-import Building from "../Building.tsx";
+import { Fragment } from "react";
+import Terrain from "../buildingAssets/Terrain.tsx";
+import Building from "../buildingAssets/Building.tsx";
 import { useCityData } from "./useCityData.ts";
+import { range } from "ramda";
+import type { buildingType } from "../../utils/assets.ts";
+import { useBuildingMode } from "../../contexts/buildingMode/BuildingModeContext.tsx";
 
 const City = ({ cityLength }: { cityLength: number }) => {
-  const cityData = useCityData(cityLength);
-  const [selectedTileId, setSelectedTileId] = useState<string | null>(null);
+  const { cityData, addBuilding, removeBuilding } = useCityData(cityLength);
+  const { buildingMode } = useBuildingMode();
 
-  const getOnClickTile = (tileId: string) => {
-    return (e: React.MouseEvent<Element>) => {
-      e.stopPropagation();
-      setSelectedTileId(tileId);
-    };
+  const getBuilding = (x: number, y: number) => {
+    if (!cityData[`${x},${y}`]) return null;
+    const buildingType = cityData[`${x},${y}`];
+    return (
+      <Building
+        type={buildingType}
+        position={{ x, y }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (buildingMode !== "bulldoze") return;
+          removeBuilding(x, y);
+        }}
+      />
+    );
   };
 
   return (
     <>
-      {cityData.map((column) =>
-        column.map((tile) => (
-          <Fragment key={tile.id}>
+      {range(0, cityLength).map((column) =>
+        range(0, cityLength).map((row) => (
+          <Fragment key={`${column}-${row}`}>
             <Terrain
               type="grass"
-              position={{ x: tile.x, y: tile.y }}
-              onClick={getOnClickTile(tile.id)}
-              isSelected={selectedTileId === tile.id}
+              position={{ x: column, y: row }}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (buildingMode === "bulldoze") return;
+                addBuilding(column, row, buildingMode as buildingType);
+              }}
             />
-            {tile.building && (
-              <Building
-                position={{ x: tile.x, y: tile.y }}
-                height={tile.building.height}
-                onClick={getOnClickTile(tile.id)}
-                isSelected={selectedTileId === tile.id}
-              />
-            )}
+            {getBuilding(column, row)}
           </Fragment>
         )),
       )}

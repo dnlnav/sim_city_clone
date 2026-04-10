@@ -1,85 +1,28 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import type { buildingType } from "../../utils/assets";
+import { dissoc } from "ramda";
 
-type Building = {
-  type: "building";
-  height: number;
-};
-
-type TileData = {
-  id: string;
-  x: number;
-  y: number;
-  building: Building | undefined;
-};
-
-type CityData = TileData[][];
-
-const initializeCityData = (size: number) => {
-  const initialValue = -Math.floor(size / 2);
-  const maxValue = Math.ceil(size / 2);
-  const data: CityData = [];
-  for (let x = initialValue; x < maxValue; x++) {
-    const column: TileData[] = [];
-    for (let y = initialValue; y < maxValue; y++) {
-      column.push({
-        id: `${x}-${y}`,
-        x,
-        y,
-        building: undefined,
-      });
-    }
-    data.push(column);
-  }
-  return data;
-};
-
-const updateTile = (tile: TileData): TileData => {
-  let updatedBuilding: Building | undefined;
-
-  switch (true) {
-    case !tile.building:
-      updatedBuilding = { type: "building", height: 1 };
-      break;
-    case tile.building!.type === "building" && tile.building!.height < 3:
-      updatedBuilding = { type: "building", height: tile.building.height + 1 };
-      break;
-    default:
-      updatedBuilding = tile.building;
-      break;
-  }
-
-  return {
-    ...tile,
-    building: updatedBuilding,
-  };
-};
-
-const updateCityData = (cityData: CityData) => {
-  return cityData.map((column) =>
-    column.map((tile) => {
-      if (Math.random() > 0.01) return tile;
-      return updateTile(tile);
-    }),
-  );
-};
+type CityData = Record<`${number},${number}`, buildingType>;
 
 export const useCityData = (size: number) => {
-  const [cityData, setCityData] = useState<CityData>(() =>
-    initializeCityData(size),
-  );
-  const intervalRef = useRef<number | null>(null);
+  const [cityData, setCityData] = useState<CityData>({});
 
-  useEffect(() => {
-    intervalRef.current = setInterval(() => {
-      setCityData(updateCityData);
-    }, 3000);
+  const addBuilding = (x: number, y: number, buildingType: buildingType) => {
+    if (x < 0 || x >= size || y < 0 || y >= size)
+      throw new Error(`Invalid position ${x},${y}`);
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [cityData]);
+    setCityData((prev) => ({
+      ...prev,
+      [`${x},${y}`]: buildingType,
+    }));
+  };
 
-  return cityData;
+  const removeBuilding = (x: number, y: number) => {
+    if (x < 0 || x >= size || y < 0 || y >= size)
+      throw new Error(`Invalid position ${x},${y}`);
+
+    setCityData(dissoc(`${x},${y}`));
+  };
+
+  return { cityData, addBuilding, removeBuilding };
 };

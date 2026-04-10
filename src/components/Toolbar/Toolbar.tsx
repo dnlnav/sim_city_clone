@@ -1,16 +1,5 @@
-import { useState } from "react";
-
-const buttons = {
-  bulldoze: "BULLDOZE",
-  street: "STREET",
-  cycleway: "CYCLEWAY",
-  footway: "FOOTWAY",
-  residential: "RESIDENTIAL",
-  commercial: "COMMERCIAL",
-  industrial: "INDUSTRIAL",
-} as const;
-
-type ToolbarButtonKey = keyof typeof buttons;
+import { useBuildingMode } from "../../contexts/buildingMode/BuildingModeContext";
+import { buildingModes } from "../../utils/assets";
 
 type ToolbarButtonProps = {
   children: React.ReactNode;
@@ -30,21 +19,20 @@ const ToolbarButton = ({ children, selected, onClick }: ToolbarButtonProps) => {
 };
 
 const Toolbar = () => {
-  const [selectedTool, setSelectedTool] =
-    useState<ToolbarButtonKey>("bulldoze");
+  const { buildingMode, setBuildingMode } = useBuildingMode();
 
   return (
     <div
       id="toolbar-container"
       className="absolute top-0 left-0 z-10 flex h-screen w-42 flex-col items-center gap-2 bg-gray-200 p-4"
     >
-      {Object.entries(buttons).map(([key, value]) => (
+      {Object.entries(buildingModes).map(([key, { name }]) => (
         <ToolbarButton
           key={key}
-          selected={selectedTool === key}
-          onClick={() => setSelectedTool(key as ToolbarButtonKey)}
+          selected={buildingMode === key}
+          onClick={() => setBuildingMode(key)}
         >
-          {value}
+          {name}
         </ToolbarButton>
       ))}
     </div>
