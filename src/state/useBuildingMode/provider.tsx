@@ -1,8 +1,5 @@
 import { useState, type ReactNode } from "react";
-import {
-  BuildingModeContext,
-  type BuildingModeKey,
-} from "./BuildingModeContext";
+import { BuildingModeContext, type BuildingModeKey } from "./context";
 
 export function BuildingModeProvider({ children }: { children: ReactNode }) {
   const [buildingMode, setBuildingMode] = useState<BuildingModeKey>("bulldoze");

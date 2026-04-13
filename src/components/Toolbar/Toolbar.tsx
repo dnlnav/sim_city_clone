@@ -1,5 +1,7 @@
-import { useBuildingMode } from "../../contexts/buildingMode/BuildingModeContext";
-import { buildingModes } from "../../utils/assets";
+import {
+  buildingModes,
+  useBuildingMode,
+} from "../../state/useBuildingMode/context";
 
 type ToolbarButtonProps = {
   children: React.ReactNode;

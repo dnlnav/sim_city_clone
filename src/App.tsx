@@ -5,7 +5,7 @@ import City from "./components/City/City";
 import { CameraControls } from "@react-three/drei";
 import type { CameraControls as CameraControlsImpl } from "@react-three/drei";
 import Toolbar from "./components/Toolbar/Toolbar";
-import { BuildingModeProvider } from "./contexts/buildingMode/provider";
+import { BuildingModeProvider } from "./state/useBuildingMode/provider";
 
 const CITY_LENGTH = 16;
 

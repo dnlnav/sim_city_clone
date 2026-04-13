@@ -1,10 +1,10 @@
 import { useRef } from "react";
 import type { Mesh } from "three";
-import type { TitePosition } from "../../utils/types";
+import type { TilePosition } from "../../utils/types";
 
 type TerrainType = "grass";
 type TerrainProps = {
-  position: TitePosition;
+  position: TilePosition;
   type: TerrainType;
   onClick: (e: React.MouseEvent<Element>) => void;
 };

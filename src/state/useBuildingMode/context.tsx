@@ -1,5 +1,31 @@
 import { createContext, use } from "react";
-import type { buildingModes } from "../../utils/assets";
+import { initialBuildingData, type buildingType } from "../useCityData/assets";
+
+export type buildingModeType = buildingType | "bulldoze";
+
+const {
+  residential,
+  commercial,
+  industrial,
+  mixed,
+  street,
+  cycleway,
+  footway,
+} = initialBuildingData;
+
+export const buildingModes: Record<
+  buildingModeType,
+  { id: string; name: string }
+> = {
+  residential,
+  commercial,
+  industrial,
+  mixed,
+  street,
+  cycleway,
+  footway,
+  bulldoze: { id: "bulldoze", name: "BULLDOZE" },
+};
 
 export type BuildingModeKey =
   (typeof buildingModes)[keyof typeof buildingModes]["id"];

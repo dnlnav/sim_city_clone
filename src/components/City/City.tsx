@@ -1,10 +1,10 @@
 import { Fragment } from "react";
-import Terrain from "../buildingAssets/Terrain.tsx";
-import Building from "../buildingAssets/Building.tsx";
-import { useCityData } from "./useCityData.ts";
+import Terrain from "./Terrain.tsx";
+import Building from "./Building.tsx";
+import { useCityData } from "../../state/useCityData/hooks.ts";
 import { range } from "ramda";
-import type { buildingType } from "../../utils/assets.ts";
-import { useBuildingMode } from "../../contexts/buildingMode/BuildingModeContext.tsx";
+import type { buildingType } from "../../state/useCityData/assets.ts";
+import { useBuildingMode } from "../../state/useBuildingMode/context.tsx";
 
 const City = ({ cityLength }: { cityLength: number }) => {
   const { cityData, addBuilding, removeBuilding } = useCityData(cityLength);
@@ -12,10 +12,10 @@ const City = ({ cityLength }: { cityLength: number }) => {
 
   const getBuilding = (x: number, y: number) => {
     if (!cityData[`${x},${y}`]) return null;
-    const buildingType = cityData[`${x},${y}`];
+    const buildingData = cityData[`${x},${y}`];
     return (
       <Building
-        type={buildingType}
+        buildingData={buildingData}
         position={{ x, y }}
         onClick={(e) => {
           e.stopPropagation();
