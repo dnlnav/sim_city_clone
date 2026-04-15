@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Color } from "three";
-import City from "./components/City/City";
+import City from "./components/city/City";
 import { CameraControls } from "@react-three/drei";
 import type { CameraControls as CameraControlsImpl } from "@react-three/drei";
 import Toolbar from "./components/Toolbar/Toolbar";
@@ -19,6 +19,7 @@ export default function App() {
       <div id="canvas-container" className="h-screen w-full">
         <Toolbar />
         <Canvas
+          shadows
           scene={{ background: new Color("skyblue") }}
           camera={{
             position: [-10, 20, -10],
@@ -29,10 +30,19 @@ export default function App() {
         >
           <CameraControls ref={controlsRef} minDistance={10} maxDistance={30} />
           <City cityLength={CITY_LENGTH} />
-          <ambientLight intensity={0.2} />
-          <directionalLight intensity={0.3} position={[0, 1, 0]} />
-          <directionalLight intensity={0.3} position={[1, 1, 0]} />
-          <directionalLight intensity={0.3} position={[0, 1, 1]} />
+          <ambientLight intensity={0.3} />
+          <directionalLight
+            intensity={1}
+            position={[20, 20, 20]}
+            castShadow
+            shadow-mapSize={[2048, 2048]}
+            shadow-camera-left={-30}
+            shadow-camera-right={30}
+            shadow-camera-top={30}
+            shadow-camera-bottom={-30}
+            shadow-camera-near={0.1}
+            shadow-camera-far={100}
+          />
         </Canvas>
       </div>
     </BuildingModeProvider>

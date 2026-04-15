@@ -1,26 +1,27 @@
 import { Fragment } from "react";
-import Terrain from "./Terrain.tsx";
-import Building from "./Building.tsx";
-import { useCityData } from "../../state/useCityData/hooks.ts";
+import Terrain from "./terrain/Terrain.tsx";
+import Building from "./building/Building.tsx";
+import { useCityData } from "./useCityData.ts";
 import { range } from "ramda";
-import type { buildingType } from "../../state/useCityData/assets.ts";
-import { useBuildingMode } from "../../state/useBuildingMode/context.tsx";
+import { useActions } from "../../state/useBuildingMode/context.tsx";
+import type { ConstructionType } from "../../utils/constants.ts";
 
 const City = ({ cityLength }: { cityLength: number }) => {
-  const { cityData, addBuilding, removeBuilding } = useCityData(cityLength);
-  const { buildingMode } = useBuildingMode();
+  const { cityData, addConstruction, removeConstruction } =
+    useCityData(cityLength);
+  const { currentAction } = useActions();
 
   const getBuilding = (x: number, y: number) => {
     if (!cityData[`${x},${y}`]) return null;
-    const buildingData = cityData[`${x},${y}`];
+    const constructionData = cityData[`${x},${y}`];
     return (
       <Building
-        buildingData={buildingData}
+        constructionData={constructionData}
         position={{ x, y }}
         onClick={(e) => {
           e.stopPropagation();
-          if (buildingMode !== "bulldoze") return;
-          removeBuilding(x, y);
+          if (currentAction !== "bulldoze") return;
+          removeConstruction(x, y);
         }}
       />
     );
@@ -36,8 +37,8 @@ const City = ({ cityLength }: { cityLength: number }) => {
               position={{ x: column, y: row }}
               onClick={(e) => {
                 e.stopPropagation();
-                if (buildingMode === "bulldoze") return;
-                addBuilding(column, row, buildingMode as buildingType);
+                if (currentAction === "bulldoze") return;
+                addConstruction(column, row, currentAction as ConstructionType);
               }}
             />
             {getBuilding(column, row)}

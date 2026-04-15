@@ -1,6 +1,8 @@
 import {
-  buildingModes,
-  useBuildingMode,
+  generalActions,
+  newBuildingActions,
+  newRoadActions,
+  useActions,
 } from "../../state/useBuildingMode/context";
 
 type ToolbarButtonProps = {
@@ -21,22 +23,46 @@ const ToolbarButton = ({ children, selected, onClick }: ToolbarButtonProps) => {
 };
 
 const Toolbar = () => {
-  const { buildingMode, setBuildingMode } = useBuildingMode();
+  const { currentAction, setCurrentAction } = useActions();
 
   return (
     <div
       id="toolbar-container"
       className="absolute top-0 left-0 z-10 flex h-screen w-42 flex-col items-center gap-2 bg-gray-200 p-4"
     >
-      {Object.entries(buildingModes).map(([key, { name }]) => (
-        <ToolbarButton
-          key={key}
-          selected={buildingMode === key}
-          onClick={() => setBuildingMode(key)}
-        >
-          {name}
-        </ToolbarButton>
-      ))}
+      <div>
+        {Object.values(generalActions).map(({ id, name }) => (
+          <ToolbarButton
+            key={id}
+            selected={currentAction === id}
+            onClick={() => setCurrentAction(id)}
+          >
+            {name}
+          </ToolbarButton>
+        ))}
+      </div>
+      <div>
+        {Object.values(newBuildingActions).map(({ id, name }) => (
+          <ToolbarButton
+            key={id}
+            selected={currentAction === id}
+            onClick={() => setCurrentAction(id)}
+          >
+            {name}
+          </ToolbarButton>
+        ))}
+      </div>
+      <div>
+        {Object.values(newRoadActions).map(({ id, name }) => (
+          <ToolbarButton
+            key={id}
+            selected={currentAction === id}
+            onClick={() => setCurrentAction(id)}
+          >
+            {name}
+          </ToolbarButton>
+        ))}
+      </div>
     </div>
   );
 };

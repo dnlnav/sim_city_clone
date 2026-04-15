@@ -1,12 +1,12 @@
 import { useState, type ReactNode } from "react";
-import { BuildingModeContext, type BuildingModeKey } from "./context";
+import { ActionsContext, type ActionType } from "./context";
 
-export function BuildingModeProvider({ children }: { children: ReactNode }) {
-  const [buildingMode, setBuildingMode] = useState<BuildingModeKey>("bulldoze");
+export function ActionsProvider({ children }: { children: ReactNode }) {
+  const [currentAction, setCurrentAction] = useState<ActionType>("select");
 
   return (
-    <BuildingModeContext value={{ buildingMode, setBuildingMode }}>
+    <ActionsContext value={{ currentAction, setCurrentAction }}>
       {children}
-    </BuildingModeContext>
+    </ActionsContext>
   );
 }

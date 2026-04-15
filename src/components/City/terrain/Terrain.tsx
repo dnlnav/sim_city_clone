@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import type { Mesh } from "three";
-import type { TilePosition } from "../../utils/types";
+import type { TilePosition } from "../../../utils/types";
 
 type TerrainType = "grass";
 type TerrainProps = {
@@ -31,7 +31,7 @@ export default function Terrain({
   if (!material) return null;
 
   return (
-    <mesh ref={meshRef} position={[x, -0.5, y]} onClick={onClick}>
+    <mesh ref={meshRef} position={[x, -0.5, y]} onClick={onClick} receiveShadow>
       <boxGeometry args={[1, 1, 1]} />
       {material}
     </mesh>

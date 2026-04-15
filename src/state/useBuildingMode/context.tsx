@@ -1,50 +1,60 @@
-import { createContext, use } from "react";
-import { initialBuildingData, type buildingType } from "../useCityData/assets";
+import { createContext, use, type Dispatch, type SetStateAction } from "react";
+import {
+  type BuildingType,
+  type GeneralAction,
+  type RoadType,
+} from "../../utils/constants";
 
-export type buildingModeType = buildingType | "bulldoze";
+export type ActionType = BuildingType | RoadType | GeneralAction;
 
-const {
-  residential,
-  commercial,
-  industrial,
-  mixed,
-  street,
-  cycleway,
-  footway,
-} = initialBuildingData;
+type ActionDataType<T extends ActionType> = {
+  [key in T]: {
+    id: key;
+    name: string;
+  };
+};
 
-export const buildingModes: Record<
-  buildingModeType,
-  { id: string; name: string }
-> = {
-  residential,
-  commercial,
-  industrial,
-  mixed,
-  street,
-  cycleway,
-  footway,
+export const generalActions: ActionDataType<GeneralAction> = {
+  resume: { id: "resume", name: "RESUME" },
+  pause: { id: "pause", name: "PAUSE" },
+  select: { id: "select", name: "SELECT" },
   bulldoze: { id: "bulldoze", name: "BULLDOZE" },
 };
 
-export type BuildingModeKey =
-  (typeof buildingModes)[keyof typeof buildingModes]["id"];
-
-type BuildingModeContextType = {
-  buildingMode: BuildingModeKey;
-  setBuildingMode: (buildingMode: BuildingModeKey) => void;
+export const newBuildingActions: ActionDataType<BuildingType> = {
+  residential: {
+    id: "residential",
+    name: "RESIDENTIAL",
+  },
+  commercial: {
+    id: "commercial",
+    name: "COMMERCIAL",
+  },
+  industrial: {
+    id: "industrial",
+    name: "INDUSTRIAL",
+  },
+  mixed: { id: "mixed", name: "MIXED" },
 };
 
-export const BuildingModeContext = createContext<
-  BuildingModeContextType | undefined
+export const newRoadActions: ActionDataType<RoadType> = {
+  street: { id: "street", name: "STREET" },
+  cycleway: { id: "cycleway", name: "CYCLEWAY" },
+  footway: { id: "footway", name: "FOOTWAY" },
+};
+
+export const ActionsContext = createContext<
+  | {
+      currentAction: ActionType;
+      setCurrentAction: Dispatch<SetStateAction<ActionType>>;
+    }
+  | undefined
 >(undefined);
 
-export function useBuildingMode() {
-  const context = use(BuildingModeContext);
+export function useActions() {
+  const context = use(ActionsContext);
   if (context === undefined) {
-    throw new Error(
-      "useBuildingMode must be used within a BuildingModeProvider",
-    );
+    throw new Error("useActions must be used within a ActionsContext");
   }
   return context;
 }
