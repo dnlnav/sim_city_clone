@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { Mesh } from "three";
 import type { TilePosition } from "../../../utils/types";
 
@@ -25,13 +25,29 @@ export default function Terrain({
   onClick,
 }: TerrainProps) {
   const meshRef = useRef<Mesh>(null);
+  const [hovered, setHovered] = useState(false);
 
-  const material = getTerrainMaterial(type, {});
+  const material = getTerrainMaterial(type, {
+    ...(hovered ? { emissive: "white", emissiveIntensity: 0.05 } : {}),
+  });
 
   if (!material) return null;
 
   return (
-    <mesh ref={meshRef} position={[x, -0.5, y]} onClick={onClick} receiveShadow>
+    <mesh
+      ref={meshRef}
+      position={[x, -0.5, y]}
+      onClick={onClick}
+      onPointerEnter={(e) => {
+        e.stopPropagation();
+        setHovered(true);
+      }}
+      onPointerLeave={(e) => {
+        e.stopPropagation();
+        setHovered(false);
+      }}
+      receiveShadow
+    >
       <boxGeometry args={[1, 1, 1]} />
       {material}
     </mesh>

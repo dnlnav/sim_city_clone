@@ -3,23 +3,29 @@ import Terrain from "./terrain/Terrain.tsx";
 import Building from "./building/Building.tsx";
 import { useCityData } from "./useCityData.ts";
 import { range } from "ramda";
-import { useActions } from "../../state/useBuildingMode/context.tsx";
+import { useActions } from "../../state/useActions.tsx";
 import type { ConstructionType } from "../../utils/constants.ts";
+import type { TileKey } from "../../utils/types.ts";
 
 const City = ({ cityLength }: { cityLength: number }) => {
   const { cityData, addConstruction, removeConstruction } =
     useCityData(cityLength);
-  const { currentAction } = useActions();
+  const { currentAction, selectedTile, setSelectedTile } = useActions();
 
   const getBuilding = (x: number, y: number) => {
-    if (!cityData[`${x},${y}`]) return null;
-    const constructionData = cityData[`${x},${y}`];
+    const tileKey: TileKey = `${x},${y}`;
+    if (!cityData[tileKey]) return null;
+    const constructionData = cityData[tileKey];
     return (
       <Building
         constructionData={constructionData}
         position={{ x, y }}
+        isSelected={currentAction === "select" && selectedTile === tileKey}
         onClick={(e) => {
           e.stopPropagation();
+          if (currentAction === "select") {
+            setSelectedTile(tileKey);
+          }
           if (currentAction !== "bulldoze") return;
           removeConstruction(x, y);
         }}

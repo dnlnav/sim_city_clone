@@ -5,12 +5,14 @@ import { type ConstructionDataType } from "./const";
 
 type BuildingProps = {
   constructionData: ConstructionDataType;
+  isSelected: boolean;
   position: TilePosition;
   onClick: (e: React.MouseEvent<Element>) => void;
 };
 
 export default function Building({
   constructionData,
+  isSelected,
   position: { x, y },
   onClick,
 }: BuildingProps) {
@@ -26,7 +28,10 @@ export default function Building({
       receiveShadow
     >
       <boxGeometry args={[1, height, 1]} />
-      <meshStandardMaterial color={color} />
+      <meshStandardMaterial
+        color={color}
+        {...(isSelected ? { emissive: "white", emissiveIntensity: 0.05 } : {})}
+      />
     </mesh>
   );
 }

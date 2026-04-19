@@ -3,64 +3,65 @@ import {
   newBuildingActions,
   newRoadActions,
   useActions,
-} from "../../state/useBuildingMode/context";
+} from "../../state/useActions.tsx";
+import ToolbarButton from "./ToolbarButton.tsx";
 
-type ToolbarButtonProps = {
-  children: React.ReactNode;
-  selected: boolean;
-  onClick: () => void;
-};
-
-const ToolbarButton = ({ children, selected, onClick }: ToolbarButtonProps) => {
-  return (
-    <button
-      className={`h-12 w-30 rounded-md border border-gray-300 ${selected ? "bg-blue-300" : "bg-white"}`}
-      onClick={onClick}
-    >
-      {children}
-    </button>
-  );
-};
+const Divider = () => (
+  <hr className="my-2 w-10 rounded border-2 border-slate-600" />
+);
 
 const Toolbar = () => {
-  const { currentAction, setCurrentAction } = useActions();
+  const { currentAction, setCurrentAction, gamePaused, setGamePaused } =
+    useActions();
 
   return (
     <div
       id="toolbar-container"
-      className="absolute top-0 left-0 z-10 flex h-screen w-42 flex-col items-center gap-2 bg-gray-200 p-4"
+      className="absolute top-0 left-0 z-10 flex h-screen w-20 flex-col items-center gap-1 border-r-4 border-slate-900 bg-slate-800 py-4 shadow-inner"
     >
-      <div>
-        {Object.values(generalActions).map(({ id, name }) => (
+      <div className="flex flex-col items-center gap-2">
+        {Object.values(generalActions).map(
+          ({ id, name, icon, color, onClick = () => setCurrentAction(id), hide }) => (
+            <ToolbarButton
+              key={id}
+              label={name}
+              icon={icon}
+              color={color}
+              selected={currentAction === id}
+              onClick={() => onClick?.({ gamePaused, setGamePaused })}
+              hide={hide?.({ gamePaused, setGamePaused })}
+            />
+          ),
+        )}
+      </div>
+
+      <Divider />
+
+      <div className="flex flex-col items-center gap-2">
+        {Object.values(newBuildingActions).map(({ id, name, icon, color }) => (
           <ToolbarButton
             key={id}
+            label={name}
+            icon={icon}
+            color={color}
             selected={currentAction === id}
             onClick={() => setCurrentAction(id)}
-          >
-            {name}
-          </ToolbarButton>
+          />
         ))}
       </div>
-      <div>
-        {Object.values(newBuildingActions).map(({ id, name }) => (
+
+      <Divider />
+
+      <div className="flex flex-col items-center gap-2">
+        {Object.values(newRoadActions).map(({ id, name, icon, color }) => (
           <ToolbarButton
             key={id}
+            label={name}
+            icon={icon}
+            color={color}
             selected={currentAction === id}
             onClick={() => setCurrentAction(id)}
-          >
-            {name}
-          </ToolbarButton>
-        ))}
-      </div>
-      <div>
-        {Object.values(newRoadActions).map(({ id, name }) => (
-          <ToolbarButton
-            key={id}
-            selected={currentAction === id}
-            onClick={() => setCurrentAction(id)}
-          >
-            {name}
-          </ToolbarButton>
+          />
         ))}
       </div>
     </div>

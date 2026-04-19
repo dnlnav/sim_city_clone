@@ -57,12 +57,12 @@ export const DEFAULT_ROAD_DATA: DefaultRoadDataType = {
     color: "darkgray",
     height: 0.1,
   },
-  cycleway: {
-    id: "cycleway",
-    name: "CYCLEWAY",
-    color: "#CA6641",
-    height: 0.1,
-  },
+  // cycleway: {
+  //   id: "cycleway",
+  //   name: "CYCLEWAY",
+  //   color: "#CA6641",
+  //   height: 0.1,
+  // },
   footway: {
     id: "footway",
     name: "FOOTWAY",

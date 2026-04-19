@@ -8,7 +8,7 @@ export type BuildingType = keyof typeof BUILDING_TYPES;
 
 export const ROAD_TYPES = {
   street: "street",
-  cycleway: "cycleway",
+  // cycleway: "cycleway",
   footway: "footway",
 } as const;
 export type RoadType = keyof typeof ROAD_TYPES;
