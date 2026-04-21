@@ -1,30 +1,65 @@
 import { Fragment } from "react";
 import Terrain from "./terrain/Terrain.tsx";
 import Building from "./building/Building.tsx";
-import { useCityData } from "./useCityData.ts";
+import { isBuilding, useCityData } from "./useCityData.ts";
 import { range } from "ramda";
-import { useActions } from "../../state/useActions.tsx";
-import type { ConstructionType } from "../../utils/constants.ts";
+import { useActions, type ActionType } from "../../state/useActions.tsx";
+import {
+  BUILDING_TYPES,
+  ROAD_TYPES,
+  type ConstructionType,
+} from "../../utils/constants.ts";
 import type { TileKey } from "../../utils/types.ts";
+import Road from "./road/Road.tsx";
+
+const isConstructionAction = (action: ActionType): action is ConstructionType =>
+  action in BUILDING_TYPES || action in ROAD_TYPES;
 
 const City = ({ cityLength }: { cityLength: number }) => {
   const { cityData, addConstruction, removeConstruction } =
     useCityData(cityLength);
   const { currentAction, selectedTile, setSelectedTile } = useActions();
 
-  const getBuilding = (x: number, y: number) => {
+  const getConstruction = (x: number, y: number) => {
     const tileKey: TileKey = `${x},${y}`;
     if (!cityData[tileKey]) return null;
-    const constructionData = cityData[tileKey];
+    const contructionType = cityData[tileKey];
+
+    if (isBuilding(contructionType)) {
+      return (
+        <Building
+          key={tileKey}
+          buildingType={contructionType}
+          position={{ x, y }}
+          isSelected={
+            currentAction === "select" && selectedTile?.position === tileKey
+          }
+          onClick={({ height }) => {
+            if (currentAction === "select") {
+              setSelectedTile({
+                position: tileKey,
+                type: contructionType,
+                height,
+              });
+            }
+            if (currentAction !== "bulldoze") return;
+            removeConstruction(x, y);
+          }}
+        />
+      );
+    }
+
     return (
-      <Building
-        constructionData={constructionData}
+      <Road
+        key={tileKey}
+        roadType={contructionType}
         position={{ x, y }}
-        isSelected={currentAction === "select" && selectedTile === tileKey}
-        onClick={(e) => {
-          e.stopPropagation();
+        isSelected={
+          currentAction === "select" && selectedTile?.position === tileKey
+        }
+        onClick={() => {
           if (currentAction === "select") {
-            setSelectedTile(tileKey);
+            setSelectedTile({ position: tileKey, type: contructionType });
           }
           if (currentAction !== "bulldoze") return;
           removeConstruction(x, y);
@@ -43,11 +78,11 @@ const City = ({ cityLength }: { cityLength: number }) => {
               position={{ x: column, y: row }}
               onClick={(e) => {
                 e.stopPropagation();
-                if (currentAction === "bulldoze") return;
-                addConstruction(column, row, currentAction as ConstructionType);
+                if (!isConstructionAction(currentAction)) return;
+                addConstruction(column, row, currentAction);
               }}
             />
-            {getBuilding(column, row)}
+            {getConstruction(column, row)}
           </Fragment>
         )),
       )}

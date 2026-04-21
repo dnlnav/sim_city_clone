@@ -4,8 +4,9 @@ import { Color } from "three";
 import City from "./components/city/City";
 import { CameraControls } from "@react-three/drei";
 import type { CameraControls as CameraControlsImpl } from "@react-three/drei";
-import Toolbar from "./components/Toolbar/Toolbar";
-import TitleBar from "./components/TitleBar/TitleBar";
+import InfoOverlay from "./components/info-overlay/InfoOverlay";
+import Toolbar from "./components/toolbar/Toolbar";
+import TitleBar from "./components/title-bar/TitleBar";
 
 const CITY_LENGTH = 16;
 
@@ -18,6 +19,7 @@ export default function App() {
     <div id="canvas-container" className="h-screen w-full">
       <Toolbar />
       <TitleBar />
+      <InfoOverlay />
       <Canvas
         shadows
         scene={{ background: new Color("skyblue") }}

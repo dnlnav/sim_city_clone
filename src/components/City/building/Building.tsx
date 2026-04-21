@@ -1,29 +1,41 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import type { Mesh } from "three";
 import type { TilePosition } from "../../../utils/types";
-import { type ConstructionDataType } from "./const";
+import type { BuildingType } from "../../../utils/constants";
+import { useBuildingState } from "./state";
 
 type BuildingProps = {
-  constructionData: ConstructionDataType;
+  buildingType: BuildingType;
   isSelected: boolean;
   position: TilePosition;
-  onClick: (e: React.MouseEvent<Element>) => void;
+  onClick: ({ height }: { height: number }) => void;
 };
 
 export default function Building({
-  constructionData,
+  buildingType,
   isSelected,
   position: { x, y },
   onClick,
 }: BuildingProps) {
   const meshRef = useRef<Mesh>(null);
-  const { height, color } = constructionData;
+  const { color, height, updateBuildingHeight } =
+    useBuildingState(buildingType);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      updateBuildingHeight();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [updateBuildingHeight]);
 
   return (
     <mesh
       ref={meshRef}
       position={[x, height / 2, y]}
-      onClick={onClick}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick({ height });
+      }}
       castShadow
       receiveShadow
     >

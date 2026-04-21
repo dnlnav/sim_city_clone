@@ -118,18 +118,24 @@ export const newRoadActions: ActionDataType<RoadType> = {
   },
 };
 
+type SelectedTile = {
+  position: TileKey;
+  type: BuildingType | RoadType;
+  height?: number;
+} | null;
+
 type ActionsState = {
   currentAction: ActionType;
   setCurrentAction: (action: ActionType) => void;
-  selectedTile: TileKey | null;
-  setSelectedTile: (tile: TileKey | null) => void;
+  selectedTile: SelectedTile;
+  setSelectedTile: (tile: SelectedTile) => void;
   gamePaused: boolean;
   setGamePaused: (paused: boolean) => void;
 };
 
 export const useActions = create<ActionsState>((set) => ({
   currentAction: "select",
-  setCurrentAction: (action: ActionType) => {
+  setCurrentAction: (action) => {
     set((state) => {
       const selectedTile =
         state.currentAction === "select" && state.currentAction !== action
@@ -139,7 +145,7 @@ export const useActions = create<ActionsState>((set) => ({
     });
   },
   selectedTile: null,
-  setSelectedTile: (tile: TileKey | null) => set({ selectedTile: tile }),
+  setSelectedTile: (tile) => set({ selectedTile: tile }),
   gamePaused: false,
-  setGamePaused: (paused: boolean) => set({ gamePaused: paused }),
+  setGamePaused: (paused) => set({ gamePaused: paused }),
 }));
