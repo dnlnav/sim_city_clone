@@ -1,6 +1,7 @@
-import { useRef, useState } from "react";
-import type { Mesh } from "three";
+import { useState } from "react";
 import type { TilePosition } from "../../../utils/types";
+import { Grass } from "../../../models/Grass";
+import { Resize } from "@react-three/drei";
 
 type TerrainType = "grass";
 type TerrainProps = {
@@ -9,47 +10,27 @@ type TerrainProps = {
   onClick: (e: React.MouseEvent<Element>) => void;
 };
 
-type MaterialProps = {
-  emissive?: string;
-  emissiveIntensity?: number;
-};
-
-const getTerrainMaterial = (type: TerrainType, props: MaterialProps) => {
-  if (type !== "grass") return null;
-  return <meshStandardMaterial color="#32CD32" {...props} />;
-};
-
-export default function Terrain({
-  position: { x, y },
-  type,
-  onClick,
-}: TerrainProps) {
-  const meshRef = useRef<Mesh>(null);
+export default function Terrain({ position: { x, y }, onClick }: TerrainProps) {
   const [hovered, setHovered] = useState(false);
 
-  const material = getTerrainMaterial(type, {
-    ...(hovered ? { emissive: "white", emissiveIntensity: 0.05 } : {}),
-  });
-
-  if (!material) return null;
-
   return (
-    <mesh
-      ref={meshRef}
-      position={[x, -0.5, y]}
-      onClick={onClick}
-      onPointerEnter={(e) => {
-        e.stopPropagation();
-        setHovered(true);
-      }}
-      onPointerLeave={(e) => {
-        e.stopPropagation();
-        setHovered(false);
-      }}
-      receiveShadow
-    >
-      <boxGeometry args={[1, 1, 1]} />
-      {material}
-    </mesh>
+    <group position={[x, -0.5, y]} dispose={null}>
+      <Resize width depth height>
+        <Grass
+          position={[-1.5, 1, 1.5]}
+          onClick={onClick}
+          onPointerEnter={(e) => {
+            e.stopPropagation();
+            setHovered(true);
+          }}
+          onPointerLeave={(e) => {
+            e.stopPropagation();
+            setHovered(false);
+          }}
+          emissive={hovered ? "white" : undefined}
+          emissiveIntensity={hovered ? 0.05 : 0}
+        />
+      </Resize>
+    </group>
   );
 }

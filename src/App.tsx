@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { Suspense, useCallback } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Color } from "three";
 import City from "./components/city/City";
@@ -30,26 +30,28 @@ export default function App() {
           far: 1000,
         }}
       >
-        <CameraControls
-          ref={controlsRef}
-          minDistance={10}
-          maxDistance={30}
-          mouseButtons={{ left: 0, right: 1, middle: 4, wheel: 32 }}
-        />
-        <City cityLength={CITY_LENGTH} />
-        <ambientLight intensity={0.3} />
-        <directionalLight
-          intensity={1}
-          position={[20, 20, 20]}
-          castShadow
-          shadow-mapSize={[2048, 2048]}
-          shadow-camera-left={-30}
-          shadow-camera-right={30}
-          shadow-camera-top={30}
-          shadow-camera-bottom={-30}
-          shadow-camera-near={0.1}
-          shadow-camera-far={100}
-        />
+        <Suspense fallback={null}>
+          <CameraControls
+            ref={controlsRef}
+            minDistance={10}
+            maxDistance={30}
+            mouseButtons={{ left: 0, right: 1, middle: 4, wheel: 32 }}
+          />
+          <City cityLength={CITY_LENGTH} />
+          <ambientLight intensity={0.3} />
+          <directionalLight
+            intensity={1}
+            position={[20, 20, 20]}
+            castShadow
+            shadow-mapSize={[2048, 2048]}
+            shadow-camera-left={-30}
+            shadow-camera-right={30}
+            shadow-camera-top={30}
+            shadow-camera-bottom={-30}
+            shadow-camera-near={0.1}
+            shadow-camera-far={100}
+          />
+        </Suspense>
       </Canvas>
     </div>
   );
