@@ -3,6 +3,8 @@ import type { Mesh } from "three";
 import type { TilePosition } from "../../../utils/types";
 import type { RoadType } from "../../../utils/constants";
 import { DEFAULT_ROAD_DATA } from "./const";
+import { Resize } from "@react-three/drei";
+import { RoadStraight } from "../../../models/RoadStraight";
 
 type RoadProps = {
   roadType: RoadType;
@@ -19,6 +21,24 @@ export default function Road({
 }: RoadProps) {
   const meshRef = useRef<Mesh>(null);
   const { color, height } = DEFAULT_ROAD_DATA[roadType];
+
+  if (roadType === "street") {
+    return (
+      <>
+        <group position={[x, 0, y]}>
+          <Resize width depth height>
+            <RoadStraight
+              onClick={(e) => {
+                e.stopPropagation();
+                onClick();
+              }}
+              isSelected={isSelected}
+            />
+          </Resize>
+        </group>
+      </>
+    );
+  }
 
   return (
     <mesh

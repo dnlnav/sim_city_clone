@@ -14,10 +14,9 @@ export default function Terrain({ position: { x, y }, onClick }: TerrainProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
-    <group position={[x, -0.5, y]} dispose={null}>
+    <group position={[x, 0, y]} dispose={null}>
       <Resize width depth height>
         <Grass
-          position={[-1.5, 1, 1.5]}
           onClick={onClick}
           onPointerEnter={(e) => {
             e.stopPropagation();
@@ -27,8 +26,7 @@ export default function Terrain({ position: { x, y }, onClick }: TerrainProps) {
             e.stopPropagation();
             setHovered(false);
           }}
-          emissive={hovered ? "white" : undefined}
-          emissiveIntensity={hovered ? 0.05 : 0}
+          isSelected={hovered}
         />
       </Resize>
     </group>
