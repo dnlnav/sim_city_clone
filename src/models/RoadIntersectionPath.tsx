@@ -1,36 +1,33 @@
 import * as THREE from "three";
 import { useGLTF } from "@react-three/drei";
 import type { JSX } from "react";
-import roadStraightUrl from "/models/road-straight-transformed.glb?url";
+import url from "/models/road-intersection-path-transformed.glb?url";
 import { useSelectableModel } from "../hooks/useSelectableModel";
 
 type GLTFResult = {
   nodes: {
-    ["road-straight_1"]: THREE.Mesh;
+    ["road-intersection-path_1"]: THREE.Mesh;
   };
   materials: {
     colormap: THREE.MeshStandardMaterial;
   };
 };
 
-export default function RoadStraight({
+export default function RoadCrossroadPath({
   isSelected,
   ...props
 }: JSX.IntrinsicElements["group"] & { isSelected: boolean }) {
-  const { nodes, materials } = useSelectableModel<GLTFResult>(
-    roadStraightUrl,
-    isSelected,
-  );
+  const { nodes, materials } = useSelectableModel<GLTFResult>(url, isSelected);
 
   return (
     <group {...props} dispose={null}>
       <mesh
         position={[0.5, 0.02, -0.5]}
-        geometry={nodes["road-straight_1"].geometry}
+        geometry={nodes["road-intersection-path_1"].geometry}
         material={materials.colormap}
       />
     </group>
   );
 }
 
-useGLTF.preload(roadStraightUrl);
+useGLTF.preload(url);

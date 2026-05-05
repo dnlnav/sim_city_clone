@@ -31,7 +31,7 @@ export default function Building({
   return (
     <mesh
       ref={meshRef}
-      position={[x, height / 2, y]}
+      position={[x + 0.5, height / 2, y - 0.5]}
       onClick={(e) => {
         e.stopPropagation();
         onClick({ height });

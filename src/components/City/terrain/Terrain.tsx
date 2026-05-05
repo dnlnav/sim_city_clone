@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { TilePosition } from "../../../utils/types";
-import { Grass } from "../../../models/Grass";
+import Grass from "../../../models/Grass";
 import { Resize } from "@react-three/drei";
 
 type TerrainType = "grass";

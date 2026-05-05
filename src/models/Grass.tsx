@@ -13,7 +13,7 @@ type GLTFResult = {
   };
 };
 
-export function Grass({
+export default function Grass({
   isSelected,
   ...props
 }: JSX.IntrinsicElements["group"] & { isSelected: boolean }) {

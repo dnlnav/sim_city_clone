@@ -4,13 +4,62 @@ import type { TilePosition } from "../../../utils/types";
 import type { RoadType } from "../../../utils/constants";
 import { DEFAULT_ROAD_DATA } from "./const";
 import { Resize } from "@react-three/drei";
-import { RoadStraight } from "../../../models/RoadStraight";
+import RoadStraight from "../../../models/RoadStraight";
+import RoadBend from "../../../models/RoadBend";
+import RoadCrossroadPath from "../../../models/RoadCrossroadPath";
+import RoadIntersectionPath from "../../../models/RoadIntersectionPath";
 
 type RoadProps = {
   roadType: RoadType;
   isSelected: boolean;
   position: TilePosition;
   onClick: () => void;
+};
+
+const getRoadModel = (onClick: () => void, isSelected: boolean) => {
+  const randomInt = Math.floor(Math.random() * 4) + 1;
+  switch (randomInt) {
+    case 1:
+      return (
+        <RoadBend
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+          isSelected={isSelected}
+        />
+      );
+    case 2:
+      return (
+        <RoadCrossroadPath
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+          isSelected={isSelected}
+        />
+      );
+    case 3:
+      return (
+        <RoadIntersectionPath
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+          isSelected={isSelected}
+        />
+      );
+    default:
+      return (
+        <RoadStraight
+          onClick={(e) => {
+            e.stopPropagation();
+            onClick();
+          }}
+          isSelected={isSelected}
+        />
+      );
+  }
 };
 
 export default function Road({
@@ -27,13 +76,7 @@ export default function Road({
       <>
         <group position={[x, 0, y]}>
           <Resize width depth height>
-            <RoadStraight
-              onClick={(e) => {
-                e.stopPropagation();
-                onClick();
-              }}
-              isSelected={isSelected}
-            />
+            {getRoadModel(onClick, isSelected)}
           </Resize>
         </group>
       </>
