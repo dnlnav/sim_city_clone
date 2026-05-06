@@ -25,7 +25,6 @@ export default function RoadStraight({
   return (
     <group {...props} dispose={null}>
       <mesh
-        position={[0.5, 0.02, -0.5]}
         geometry={nodes["road-straight_1"].geometry}
         material={materials.colormap}
       />

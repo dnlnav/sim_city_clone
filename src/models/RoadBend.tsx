@@ -22,7 +22,6 @@ export default function RoadBend({
   return (
     <group {...props} dispose={null}>
       <mesh
-        position={[0.5, 0.02, -0.5]}
         geometry={nodes["road-bend_1"].geometry}
         material={materials.colormap}
       />

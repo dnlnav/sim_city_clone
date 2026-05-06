@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import Terrain from "./terrain/Terrain.tsx";
 import Building from "./building/Building.tsx";
-import { isBuilding, useCityData } from "./useCityData.ts";
+import { isBuilding, useCityData, type CityData } from "./useCityData.ts";
 import { range } from "ramda";
 import { useActions, type ActionType } from "../../state/useActions.tsx";
 import {
@@ -20,10 +20,12 @@ const City = ({ cityLength }: { cityLength: number }) => {
     useCityData(cityLength);
   const { currentAction, selectedTile, setSelectedTile } = useActions();
 
-  const getConstruction = (x: number, y: number) => {
-    const tileKey: TileKey = `${x},${y}`;
-    if (!cityData[tileKey]) return null;
-    const contructionType = cityData[tileKey];
+  const getConstruction = (
+    tileKey: TileKey,
+    contructionType: ConstructionType,
+    cityData: CityData,
+  ) => {
+    const [x, y] = tileKey.split(",").map(Number);
 
     if (isBuilding(contructionType)) {
       return (
@@ -57,6 +59,7 @@ const City = ({ cityLength }: { cityLength: number }) => {
         isSelected={
           currentAction === "select" && selectedTile?.position === tileKey
         }
+        cityData={cityData}
         onClick={() => {
           if (currentAction === "select") {
             setSelectedTile({ position: tileKey, type: contructionType });
@@ -72,20 +75,23 @@ const City = ({ cityLength }: { cityLength: number }) => {
     <>
       {range(0, cityLength).map((column) =>
         range(0, cityLength).map((row) => (
-          <Fragment key={`${column}-${row}`}>
-            <Terrain
-              type="grass"
-              position={{ x: column, y: row }}
-              onClick={(e) => {
-                e.stopPropagation();
-                if (!isConstructionAction(currentAction)) return;
-                addConstruction(column, row, currentAction);
-              }}
-            />
-            {getConstruction(column, row)}
-          </Fragment>
+          <Terrain
+            key={`${column}-${row}-terrain`}
+            type="grass"
+            position={{ x: column, y: row }}
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!isConstructionAction(currentAction)) return;
+              addConstruction(column, row, currentAction);
+            }}
+          />
         )),
       )}
+      {Object.entries(cityData).map(([key, value]) => (
+        <Fragment key={`${key}-construction`}>
+          {getConstruction(key as TileKey, value, cityData)}
+        </Fragment>
+      ))}
     </>
   );
 };

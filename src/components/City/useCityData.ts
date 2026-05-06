@@ -7,11 +7,14 @@ import {
   type ConstructionType,
 } from "../../utils/constants";
 
-type CityData = Record<TileKey, ConstructionType>;
+export type CityData = Record<TileKey, ConstructionType>;
 
 export const isBuilding = (
   contructionType: ConstructionType,
 ): contructionType is BuildingType => contructionType in BUILDING_TYPES;
+
+export const isStreet = (contructionType: ConstructionType) =>
+  contructionType === "street";
 
 export const useCityData = (size: number) => {
   const [cityData, setCityData] = useState<CityData>({});

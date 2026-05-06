@@ -8,64 +8,58 @@ import RoadStraight from "../../../models/RoadStraight";
 import RoadBend from "../../../models/RoadBend";
 import RoadCrossroadPath from "../../../models/RoadCrossroadPath";
 import RoadIntersectionPath from "../../../models/RoadIntersectionPath";
+import type { CityData } from "../useCityData";
+import { getRoadTypeAndRotation } from "./utils";
 
 type RoadProps = {
   roadType: RoadType;
   isSelected: boolean;
   position: TilePosition;
   onClick: () => void;
+  cityData: CityData;
 };
 
-const getRoadModel = (onClick: () => void, isSelected: boolean) => {
-  const randomInt = Math.floor(Math.random() * 4) + 1;
-  switch (randomInt) {
-    case 1:
-      return (
-        <RoadBend
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
-          isSelected={isSelected}
-        />
-      );
-    case 2:
-      return (
-        <RoadCrossroadPath
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
-          isSelected={isSelected}
-        />
-      );
-    case 3:
-      return (
-        <RoadIntersectionPath
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
-          isSelected={isSelected}
-        />
-      );
-    default:
-      return (
-        <RoadStraight
-          onClick={(e) => {
-            e.stopPropagation();
-            onClick();
-          }}
-          isSelected={isSelected}
-        />
-      );
-  }
+const RoadModelList = {
+  straight: RoadStraight,
+  edge: RoadBend,
+  crossroad: RoadCrossroadPath,
+  intersection: RoadIntersectionPath,
+} as const;
+
+const getRoadModel = ({
+  onClick,
+  isSelected,
+  position,
+  cityData,
+}: {
+  onClick: () => void;
+  isSelected: boolean;
+  position: TilePosition;
+  cityData: CityData;
+}) => {
+  const { type, rotation } = getRoadTypeAndRotation(position, cityData);
+
+  const RoadModel = RoadModelList[type];
+
+  return (
+    <RoadModel
+      position={[0.5, 0.02, -0.5]}
+      rotation={[0, rotation ?? 0, 0]}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      isSelected={isSelected}
+    />
+  );
 };
 
 export default function Road({
   roadType,
   isSelected,
+  position,
   position: { x, y },
+  cityData,
   onClick,
 }: RoadProps) {
   const meshRef = useRef<Mesh>(null);
@@ -76,7 +70,7 @@ export default function Road({
       <>
         <group position={[x, 0, y]}>
           <Resize width depth height>
-            {getRoadModel(onClick, isSelected)}
+            {getRoadModel({ onClick, isSelected, position, cityData })}
           </Resize>
         </group>
       </>
